@@ -15,6 +15,13 @@ export class GWFVisApp extends LitElement {
   @state()
   config?: GWFVisHostConfig;
 
+  async firstUpdated() {
+    const configUrl = new URLSearchParams(location.search).get("configUrl");
+    if (configUrl) {
+      this.config = await fetch(configUrl).then((response) => response.json());
+    }
+  }
+
   render() {
     return html`${when(
       this.config,
