@@ -25,7 +25,7 @@ export class GWFVisApp extends LitElement {
       "launchQueue" in window &&
       "files" in (window as any).LaunchParams.prototype
     ) {
-      (window as any).LaunchParams.setConsumer((launchParams: any) => {
+      (window as any).launchQueue.setConsumer((launchParams: any) => {
         // Nothing to do when the queue is empty.
         if (!launchParams.files.length) {
           return;
