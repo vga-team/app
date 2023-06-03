@@ -67,7 +67,7 @@ export class GWFVisApp extends LitElement {
           {
             description: "GWF Vis Config File",
             accept: {
-              "application/gwfvisconf+json": [".gwfvisconf.json"],
+              "application/json": [".gwfvisconf"],
             },
           },
         ],

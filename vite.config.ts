@@ -31,7 +31,7 @@ export default defineConfig({
           {
             action: "./",
             accept: {
-              "application/gwfvisconf+json": [".gwfvisconf.json"],
+              "application/json": [".gwfvisconf"],
             },
           },
         ],
