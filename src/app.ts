@@ -20,6 +20,21 @@ export class GWFVisApp extends LitElement {
     if (configUrl) {
       this.config = await fetch(configUrl).then((response) => response.json());
     }
+
+    if (
+      "launchQueue" in window &&
+      "files" in (window as any).LaunchParams.prototype
+    ) {
+      (window as any).LaunchParams.setConsumer((launchParams: any) => {
+        // Nothing to do when the queue is empty.
+        if (!launchParams.files.length) {
+          return;
+        }
+        for (const fileHandle of launchParams.files) {
+          this.loadConfigFile(fileHandle);
+        }
+      });
+    }
   }
 
   render() {
@@ -33,8 +48,8 @@ export class GWFVisApp extends LitElement {
   private renderUI() {
     return html`
       <div style="display: flex; height: 2.5rem; justify-content: center;">
-        <img src="./gwf.jpg" />
-        <span style="font-size: 2rem; margin-left: 1rem;">GWF Vis App</span>
+        <img src="./icons/gwf-512x512.png" />
+        <div style="font-size: 2rem; margin-left: 1rem;">GWF Vis App</div>
       </div>
       <gwf-vis-ui-button
         style="display: block; width: fit-content; margin: 0 auto;"
@@ -45,17 +60,19 @@ export class GWFVisApp extends LitElement {
     `;
   }
 
-  private async loadConfigFile() {
-    const [fileHandle] = (await (window as any).showOpenFilePicker({
-      types: [
-        {
-          description: "JSON",
-          accept: {
-            "application/json": [".json"],
+  private async loadConfigFile(fileHandle?: FileSystemFileHandle) {
+    if (!fileHandle) {
+      [fileHandle] = (await (window as any).showOpenFilePicker({
+        types: [
+          {
+            description: "GWF Vis Config File",
+            accept: {
+              "application/gwfvisconf+json": [".gwfvisconf.json"],
+            },
           },
-        },
-      ],
-    })) as FileSystemFileHandle[];
+        ],
+      })) as FileSystemFileHandle[];
+    }
     const file = await fileHandle?.getFile();
     const jsonText = await file?.text();
     if (jsonText) {
