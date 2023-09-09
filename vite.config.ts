@@ -11,9 +11,9 @@ export default defineConfig({
         enabled: true,
       },
       manifest: {
-        name: "GWF Vis App",
-        short_name: "GWFVis",
-        description: "GWF Vis App",
+        name: "VGA",
+        short_name: "VGA",
+        description: "VGA App",
         theme_color: "#ffffff",
         icons: [
           {
@@ -31,7 +31,7 @@ export default defineConfig({
           {
             action: "./",
             accept: {
-              "application/json": [".gwfvisconf"],
+              "application/json": [".vgaconf"],
             },
           },
         ],
