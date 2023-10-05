@@ -1,8 +1,8 @@
 import { html, css, LitElement } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { when } from "lit/directives/when.js";
-import "gwf-vis-host";
-import { GWFVisHostConfig } from "../node_modules/gwf-vis-host/types/utils/gwf-vis-host-config";
+import "vga-vis-host";
+import { GWFVisHostConfig } from "vga-vis-host";
 
 @customElement("gwf-vis-app")
 export class GWFVisApp extends LitElement {

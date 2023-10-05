@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "gwf-vis-host": "github:river-flow-vis/gwf-vis-host#6cb5f820a0759ad11e47644e4de17c463e4391d8",
-    "lit": "^2.7.2"
+    "lit": "^2.7.2",
+    "vga-vis-host": "github:vga-team/vis-host#eccc923dbe96f60c867cffac2cf6b4f966f78c39"
   },
   "devDependencies": {
     "typescript": "^5.0.2",
