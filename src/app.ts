@@ -49,7 +49,7 @@ export class GWFVisApp extends LitElement {
     return html`
       <div style="display: flex; height: 2.5rem; justify-content: center;">
         <img src="./icons/gwf-512x512.png" />
-        <div style="font-size: 2rem; margin-left: 1rem;">GWF Vis App</div>
+        <div style="font-size: 2rem; margin-left: 1rem;">VGA App</div>
       </div>
       <gwf-vis-ui-button
         style="display: block; width: fit-content; margin: 0 auto;"
@@ -65,9 +65,9 @@ export class GWFVisApp extends LitElement {
       [fileHandle] = (await (window as any).showOpenFilePicker({
         types: [
           {
-            description: "GWF Vis Config File",
+            description: "VGA Config File",
             accept: {
-              "application/json": [".gwfvisconf"],
+              "application/json": [".vgaconf"],
             },
           },
         ],
