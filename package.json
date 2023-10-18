@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "lit": "^2.7.2",
-    "vga-vis-host": "github:vga-team/vis-host#00112427727fd669461c3f2d533abdd6f6f5499e"
+    "vga-vis-host": "github:vga-team/vis-host#dc2cce585da9f4549f7739401c6413ef054d79eb"
   },
   "devDependencies": {
     "typescript": "^5.0.2",
