@@ -40,7 +40,11 @@ export class GWFVisApp extends LitElement {
   render() {
     return html`${when(
       this.config,
-      () => html`<gwf-vis-host .config=${this.config}></gwf-vis-host>`,
+      () =>
+        html`<gwf-vis-host
+          allow-modifying-page-info
+          .config=${this.config}
+        ></gwf-vis-host>`,
       () => this.renderUI()
     )}`;
   }
