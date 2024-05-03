@@ -224,9 +224,8 @@ export class VGAApp extends LitElement {
       return recent.url === url;
     });
     const recent =
-      exsitingIndex >= 0
-        ? recents.splice(exsitingIndex, 1)[0]
-        : { name, icon, fileHandle, content, url };
+      exsitingIndex >= 0 ? recents.splice(exsitingIndex, 1)[0] : {};
+    Object.assign(recent, { name, icon, fileHandle, content, url });
     recents.unshift(recent);
     if (recents.length > 10) {
       recents.pop();
