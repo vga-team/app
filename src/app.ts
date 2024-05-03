@@ -1,8 +1,21 @@
 import { html, css, LitElement } from "lit";
 import { customElement, state } from "lit/decorators.js";
+import { until } from "lit/directives/until.js";
 import { when } from "lit/directives/when.js";
+import * as kv from "idb-keyval";
 import "vga-vis-host";
 import { GWFVisHostConfig } from "vga-vis-host";
+
+const VGA_ICON_SRC = "./icons/vga-512x512.png";
+const VGA_DEFAULT_NAME = "VGA App";
+
+type RecentOpened = {
+  name?: string;
+  icon?: string;
+  fileHandle?: FileSystemFileHandle;
+  content?: GWFVisHostConfig;
+  url?: string;
+};
 
 @customElement("vga-app")
 export class VGAApp extends LitElement {
@@ -20,18 +33,40 @@ export class VGAApp extends LitElement {
       width: fit-content;
       margin: 10px auto;
     }
+    .recent-card {
+      display: grid;
+      grid-template-columns: 3em 1fr;
+      border-radius: 10px;
+      height: 3em;
+      box-shadow: 1px 1px 2px 1px hsl(0, 0%, 0%, 0.5);
+      margin: 5px 10px;
+      padding: 5px;
+      user-select: none;
+      cursor: pointer;
+      &:hover {
+        box-shadow: 1px 1px 5px 2px hsl(0, 0%, 0%, 0.5);
+      }
+      &:active {
+        box-shadow: inset 1px 1px 5px 2px hsl(0, 0%, 0%, 0.5);
+      }
+      & img {
+        display: block;
+        height: 2.5em;
+        margin: auto;
+      }
+      & div {
+        margin: auto auto auto 0.5em;
+      }
+    }
   `;
 
   @state()
   config?: GWFVisHostConfig;
 
   async firstUpdated() {
-    const configUrl = new URLSearchParams(location.search).get("configUrl");
-    if (configUrl) {
-      this.config = await fetch(configUrl).then((response) => response.json());
-    }
-
+    let configSource = new URLSearchParams(location.search).get("configUrl");
     if (
+      !configSource &&
       "launchQueue" in window &&
       "files" in (window as any).LaunchParams.prototype
     ) {
@@ -40,11 +75,10 @@ export class VGAApp extends LitElement {
         if (!launchParams.files.length) {
           return;
         }
-        for (const fileHandle of launchParams.files) {
-          this.loadConfigFile(fileHandle);
-        }
+        configSource = launchParams.files?.[0];
       });
     }
+    await this.loadConfig(configSource);
   }
 
   render() {
@@ -61,14 +95,80 @@ export class VGAApp extends LitElement {
 
   private renderUI() {
     return html`
-      <img class="logo" src="./icons/vga-512x512.png" alt="VGA App" />
+      <img class="logo" src=${VGA_ICON_SRC} alt=${VGA_DEFAULT_NAME} />
       <gwf-vis-ui-button @click=${() => this.loadConfigFile()}>
         Load Config File
       </gwf-vis-ui-button>
       <gwf-vis-ui-button @click=${() => this.openConfigURL()}>
         Open Config URL
       </gwf-vis-ui-button>
+      <hr />
+      <h3>Recents</h3>
+      ${until(
+        kv.get("recents").then((recents: RecentOpened[]) =>
+          recents?.map(
+            ({ name, icon, fileHandle, content, url }) =>
+              html`<div
+                class="recent-card"
+                @click=${async () =>
+                  await this.loadConfig({
+                    name,
+                    icon,
+                    fileHandle,
+                    content,
+                    url,
+                  })}
+              >
+                <img
+                  src=${icon ?? VGA_ICON_SRC}
+                  alt=${name ?? VGA_DEFAULT_NAME}
+                />
+                <div>
+                  ${name ?? VGA_DEFAULT_NAME} -
+                  ${fileHandle
+                    ? "load the cached file (" + fileHandle.name + ")"
+                    : "use " + url}
+                </div>
+              </div>`
+          )
+        )
+      )}
     `;
+  }
+
+  private async loadConfig(
+    source?: FileSystemFileHandle | string | RecentOpened | null
+  ) {
+    if (!source) {
+      return;
+    }
+    if (typeof source === "string") {
+      this.loadConfigUrl(source);
+      return;
+    }
+    if (source instanceof FileSystemFileHandle) {
+      this.loadConfigFile(source);
+      return;
+    }
+    if (source.content) {
+      this.config = source.content;
+      await this.updateRecents(source);
+      return;
+    }
+    this.loadConfigUrl(source.url);
+  }
+
+  private async loadConfigUrl(url?: string) {
+    if (!url) {
+      alert("Invalid config URL.");
+      return;
+    }
+    this.config = await fetch(url).then((response) => response.json());
+    await this.updateRecents({
+      name: this.config?.pageTitle,
+      icon: this.config?.favicon,
+      url,
+    });
   }
 
   private async loadConfigFile(fileHandle?: FileSystemFileHandle) {
@@ -88,6 +188,12 @@ export class VGAApp extends LitElement {
     const jsonText = await file?.text();
     if (jsonText) {
       this.config = JSON.parse(jsonText);
+      await this.updateRecents({
+        name: this.config?.pageTitle,
+        icon: this.config?.favicon,
+        fileHandle,
+        content: this.config,
+      });
     }
   }
 
@@ -97,5 +203,34 @@ export class VGAApp extends LitElement {
       alert("No content.");
     }
     location.search = "?configUrl=" + url;
+  }
+
+  private async updateRecents({
+    name,
+    icon,
+    fileHandle,
+    content,
+    url,
+  }: RecentOpened) {
+    const recents =
+      ((await kv.get("recents")) as RecentOpened[] | undefined) ?? [];
+    const exsitingIndex = recents.findIndex((recent) => {
+      if (fileHandle) {
+        return (
+          recent.fileHandle?.name === fileHandle.name &&
+          JSON.stringify(content) == JSON.stringify(this.config)
+        );
+      }
+      return recent.url === url;
+    });
+    const recent =
+      exsitingIndex >= 0
+        ? recents.splice(exsitingIndex, 1)[0]
+        : { name, icon, fileHandle, content, url };
+    recents.unshift(recent);
+    if (recents.length > 10) {
+      recents.pop();
+    }
+    await kv.set("recents", recents);
   }
 }
