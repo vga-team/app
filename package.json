@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "idb-keyval": "^6.2.1",
     "lit": "^2.7.2",
     "vga-vis-host": "github:vga-team/vis-host#3aff283f21c77b229c3a6b8bee6489d3a2a566ff"
   },
