@@ -10,6 +10,16 @@ export class VGAApp extends LitElement {
     :host {
       display: block;
     }
+    .logo {
+      display: block;
+      margin: auto;
+      max-width: 100vw;
+    }
+    gwf-vis-ui-button {
+      display: block;
+      width: fit-content;
+      margin: 10px auto;
+    }
   `;
 
   @state()
@@ -51,15 +61,12 @@ export class VGAApp extends LitElement {
 
   private renderUI() {
     return html`
-      <div style="display: flex; height: 2.5rem; justify-content: center;">
-        <img src="./icons/vga-512x512.png" />
-        <div style="font-size: 2rem; margin-left: 1rem;">VGA App</div>
-      </div>
-      <gwf-vis-ui-button
-        style="display: block; width: fit-content; margin: 0 auto;"
-        @click=${() => this.loadConfigFile()}
-      >
+      <img class="logo" src="./icons/vga-512x512.png" alt="VGA App" />
+      <gwf-vis-ui-button @click=${() => this.loadConfigFile()}>
         Load Config File
+      </gwf-vis-ui-button>
+      <gwf-vis-ui-button @click=${() => this.openConfigURL()}>
+        Open Config URL
       </gwf-vis-ui-button>
     `;
   }
@@ -82,5 +89,13 @@ export class VGAApp extends LitElement {
     if (jsonText) {
       this.config = JSON.parse(jsonText);
     }
+  }
+
+  private openConfigURL() {
+    const url = prompt("Enter the URL: ");
+    if (!url) {
+      alert("No content.");
+    }
+    location.search = "?configUrl=" + url;
   }
 }
