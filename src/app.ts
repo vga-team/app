@@ -4,8 +4,8 @@ import { when } from "lit/directives/when.js";
 import "vga-vis-host";
 import { GWFVisHostConfig } from "vga-vis-host";
 
-@customElement("gwf-vis-app")
-export class GWFVisApp extends LitElement {
+@customElement("vga-app")
+export class VGAApp extends LitElement {
   static styles = css`
     :host {
       display: block;
@@ -52,7 +52,7 @@ export class GWFVisApp extends LitElement {
   private renderUI() {
     return html`
       <div style="display: flex; height: 2.5rem; justify-content: center;">
-        <img src="./icons/gwf-512x512.png" />
+        <img src="./icons/vga-512x512.png" />
         <div style="font-size: 2rem; margin-left: 1rem;">VGA App</div>
       </div>
       <gwf-vis-ui-button

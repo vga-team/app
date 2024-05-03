@@ -17,12 +17,12 @@ export default defineConfig({
         theme_color: "#ffffff",
         icons: [
           {
-            src: "./icons/gwf-192x192.png",
+            src: "./icons/vga-192x192.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "./icons/gwf-512x512.png",
+            src: "./icons/vga-512x512.png",
             sizes: "512x512",
             type: "image/png",
           },
