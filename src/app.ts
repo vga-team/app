@@ -234,7 +234,7 @@ export class VGAApp extends LitElement {
       if (
         recent.source === source ||
         (source instanceof FileSystemFileHandle &&
-          (await (recent.source as any)?.isSameEntry(source)))
+          (await (recent.source as any)?.isSameEntry?.(source)))
       ) {
         exsitingIndex = i;
         break;
