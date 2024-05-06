@@ -215,6 +215,7 @@ export class VGAApp extends LitElement {
     const url = prompt("Enter the URL: ");
     if (!url) {
       alert("No content.");
+      return;
     }
     location.search = "?configUrl=" + url;
   }
