@@ -12,9 +12,7 @@ const VGA_DEFAULT_NAME = "VGA App";
 type RecentOpened = {
   name?: string;
   icon?: string;
-  fileHandle?: FileSystemFileHandle;
-  content?: GWFVisHostConfig;
-  url?: string;
+  source?: FileSystemFileHandle | string;
 };
 
 @customElement("vga-app")
@@ -107,17 +105,10 @@ export class VGAApp extends LitElement {
       ${until(
         kv.get("recents").then((recents: RecentOpened[]) =>
           recents?.map(
-            ({ name, icon, fileHandle, content, url }) =>
+            ({ name, icon, source }) =>
               html`<div
                 class="recent-card"
-                @click=${async () =>
-                  await this.loadConfig({
-                    name,
-                    icon,
-                    fileHandle,
-                    content,
-                    url,
-                  })}
+                @click=${async () => await this.loadConfig(source)}
               >
                 <img
                   src=${icon ?? VGA_ICON_SRC}
@@ -125,9 +116,9 @@ export class VGAApp extends LitElement {
                 />
                 <div>
                   ${name ?? VGA_DEFAULT_NAME} -
-                  ${fileHandle
-                    ? "load the cached file (" + fileHandle.name + ")"
-                    : "use " + url}
+                  ${typeof source === "string"
+                    ? `URL: ${source}`
+                    : `File: ${source?.name}`}
                 </div>
               </div>`
           )
@@ -147,15 +138,16 @@ export class VGAApp extends LitElement {
       return;
     }
     if (source instanceof FileSystemFileHandle) {
+      const permissionStatus = await ((source as any).requestPermission({
+        mode: "read",
+      }) as Promise<PermissionState>);
+      if (permissionStatus !== "granted") {
+        alert("Permission denied for read the file.");
+        return;
+      }
       this.loadConfigFile(source);
       return;
     }
-    if (source.content) {
-      this.config = source.content;
-      await this.updateRecents(source);
-      return;
-    }
-    this.loadConfigUrl(source.url);
   }
 
   private async loadConfigUrl(url?: string) {
@@ -167,7 +159,7 @@ export class VGAApp extends LitElement {
     await this.updateRecents({
       name: this.config?.pageTitle,
       icon: this.config?.favicon,
-      url,
+      source: url,
     });
   }
 
@@ -191,8 +183,7 @@ export class VGAApp extends LitElement {
       await this.updateRecents({
         name: this.config?.pageTitle,
         icon: this.config?.favicon,
-        fileHandle,
-        content: this.config,
+        source: fileHandle,
       });
     }
   }
@@ -205,27 +196,16 @@ export class VGAApp extends LitElement {
     location.search = "?configUrl=" + url;
   }
 
-  private async updateRecents({
-    name,
-    icon,
-    fileHandle,
-    content,
-    url,
-  }: RecentOpened) {
+  private async updateRecents({ name, icon, source }: RecentOpened) {
     const recents =
       ((await kv.get("recents")) as RecentOpened[] | undefined) ?? [];
-    const exsitingIndex = recents.findIndex((recent) => {
-      if (fileHandle) {
-        return (
-          recent.fileHandle?.name === fileHandle.name &&
-          JSON.stringify(content) == JSON.stringify(this.config)
-        );
-      }
-      return recent.url === url;
-    });
+    const exsitingIndex = recents.findIndex(
+      (recent) =>
+        recent.source === source || (recent.source as any)?.isSameEntry(source)
+    );
     const recent =
       exsitingIndex >= 0 ? recents.splice(exsitingIndex, 1)[0] : {};
-    Object.assign(recent, { name, icon, fileHandle, content, url });
+    Object.assign(recent, { name, icon, source });
     recents.unshift(recent);
     if (recents.length > 10) {
       recents.pop();
