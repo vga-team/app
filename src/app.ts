@@ -73,6 +73,10 @@ export class VGAApp extends LitElement {
   config?: GWFVisHostConfig;
 
   async firstUpdated() {
+    if (history.state?.config) {
+      this.config = history.state.config;
+      return;
+    }
     let configSource = new URLSearchParams(location.search).get("configUrl");
     if (
       !configSource &&
@@ -183,7 +187,14 @@ export class VGAApp extends LitElement {
       return;
     }
     this.config = await fetch(url).then((response) => response.json());
-    await this.updateRecents({
+    history.pushState(
+      {
+        config: this.config,
+      },
+      "",
+      `?configFile=${url}`
+    );
+    this.updateRecents({
       name: this.config?.pageTitle,
       icon: this.config?.favicon,
       source: url,
@@ -205,15 +216,19 @@ export class VGAApp extends LitElement {
     }
     const file = await fileHandle?.getFile();
     const jsonText = await file?.text();
+    this.config = JSON.parse(jsonText);
     if (jsonText) {
-      this.config = JSON.parse(jsonText);
-      await this.updateRecents({
+      history.pushState(
+        { config: this.config },
+        "",
+        `?configFile=${fileHandle.name}`
+      );
+      this.updateRecents({
         name: this.config?.pageTitle,
         icon: this.config?.favicon,
         source: fileHandle,
       });
     }
-    location.search = `?configFile=${fileHandle.name}`;
   }
 
   private openConfigURL() {
