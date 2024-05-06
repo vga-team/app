@@ -222,10 +222,17 @@ export class VGAApp extends LitElement {
   private async updateRecents({ name, icon, source }: RecentOpened) {
     const recents =
       ((await kv.get("recents")) as RecentOpened[] | undefined) ?? [];
-    const exsitingIndex = recents.findIndex(
-      (recent) =>
-        recent.source === source || (recent.source as any)?.isSameEntry(source)
-    );
+    let exsitingIndex = -1;
+    for (let i = 0; i < recents.length; i++) {
+      const recent = recents[i];
+      if (
+        recent.source === source ||
+        (await (recent.source as any)?.isSameEntry(source))
+      ) {
+        exsitingIndex = i;
+        break;
+      }
+    }
     const recent =
       exsitingIndex >= 0 ? recents.splice(exsitingIndex, 1)[0] : {};
     Object.assign(recent, { name, icon, source });
