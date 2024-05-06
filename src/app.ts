@@ -228,7 +228,8 @@ export class VGAApp extends LitElement {
       const recent = recents[i];
       if (
         recent.source === source ||
-        (await (recent.source as any)?.isSameEntry(source))
+        (source instanceof FileSystemFileHandle &&
+          (await (recent.source as any)?.isSameEntry(source)))
       ) {
         exsitingIndex = i;
         break;
