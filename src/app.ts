@@ -33,7 +33,7 @@ export class VGAApp extends LitElement {
     }
     .recent-card {
       display: grid;
-      grid-template-columns: 3em 1fr;
+      grid-template-columns: 3em 1fr auto;
       border-radius: 10px;
       height: 3em;
       box-shadow: 1px 1px 2px 1px hsl(0, 0%, 0%, 0.5);
@@ -54,6 +54,17 @@ export class VGAApp extends LitElement {
       }
       & div {
         margin: auto auto auto 0.5em;
+      }
+      .remove-button {
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        &:hover {
+          box-shadow: 1px 1px 5px 2px hsl(0, 0%, 0%, 0.5);
+        }
+        &:active {
+          box-shadow: inset 1px 1px 5px 2px hsl(0, 0%, 0%, 0.5);
+        }
       }
     }
   `;
@@ -105,7 +116,7 @@ export class VGAApp extends LitElement {
       ${until(
         kv.get("recents").then((recents: RecentOpened[]) =>
           recents?.map(
-            ({ name, icon, source }) =>
+            ({ name, icon, source }, i) =>
               html`<div
                 class="recent-card"
                 @click=${async () => await this.loadConfig(source)}
@@ -120,6 +131,18 @@ export class VGAApp extends LitElement {
                     ? `URL: ${source}`
                     : `File: ${source?.name}`}
                 </div>
+                <button
+                  class="remove-button"
+                  @click=${async (event: Event) => {
+                    debugger;
+                    event.stopPropagation();
+                    recents.splice(i, 1);
+                    kv.set("recents", recents);
+                    this.requestUpdate();
+                  }}
+                >
+                  Remove
+                </button>
               </div>`
           )
         )
