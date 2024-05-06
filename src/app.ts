@@ -119,7 +119,12 @@ export class VGAApp extends LitElement {
             ({ name, icon, source }, i) =>
               html`<div
                 class="recent-card"
-                @click=${async () => await this.loadConfig(source)}
+                @click=${async () => {
+                  if (typeof source === "string") {
+                    location.search = `?configUrl=${source}`;
+                  }
+                  await this.loadConfig(source);
+                }}
               >
                 <img
                   src=${icon ?? VGA_ICON_SRC}
@@ -134,7 +139,6 @@ export class VGAApp extends LitElement {
                 <button
                   class="remove-button"
                   @click=${async (event: Event) => {
-                    debugger;
                     event.stopPropagation();
                     recents.splice(i, 1);
                     kv.set("recents", recents);
@@ -209,6 +213,7 @@ export class VGAApp extends LitElement {
         source: fileHandle,
       });
     }
+    location.search = `?configFile=${fileHandle.name}`;
   }
 
   private openConfigURL() {
@@ -217,7 +222,7 @@ export class VGAApp extends LitElement {
       alert("No content.");
       return;
     }
-    location.search = "?configUrl=" + url;
+    location.search = `?configUrl=${url}`;
   }
 
   private async updateRecents({ name, icon, source }: RecentOpened) {
