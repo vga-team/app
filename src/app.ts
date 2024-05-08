@@ -40,6 +40,7 @@ export class VGAApp extends LitElement {
       margin: 5px 10px;
       padding: 5px;
       user-select: none;
+      gap: 0.5em;
       cursor: pointer;
       &:hover {
         box-shadow: 1px 1px 5px 2px hsl(0, 0%, 0%, 0.5);
@@ -53,7 +54,8 @@ export class VGAApp extends LitElement {
         margin: auto;
       }
       & div {
-        margin: auto auto auto 0.5em;
+        overflow: hidden;
+        max-width: 100%;
       }
       .remove-button {
         border: none;
