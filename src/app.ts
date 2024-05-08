@@ -77,7 +77,9 @@ export class VGAApp extends LitElement {
 
   async firstUpdated() {
     if (history.state?.config) {
+      this.visHostBaseUrl = history.state.visHostBaseUrl;
       this.config = history.state.config;
+      history.replaceState({}, "");
       return;
     }
     let configSource = new URLSearchParams(location.search).get("configUrl");
@@ -197,6 +199,7 @@ export class VGAApp extends LitElement {
     this.config = await fetch(url).then((response) => response.json());
     history.pushState(
       {
+        visHostBaseUrl: new URL("./", url).href,
         config: this.config,
       },
       "",
