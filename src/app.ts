@@ -72,6 +72,9 @@ export class VGAApp extends LitElement {
   @state()
   config?: GWFVisHostConfig;
 
+  @state()
+  visHostBaseUrl?: string;
+
   async firstUpdated() {
     if (history.state?.config) {
       this.config = history.state.config;
@@ -100,6 +103,7 @@ export class VGAApp extends LitElement {
       () =>
         html`<gwf-vis-host
           allow-modifying-page-info
+          .configBaseUrl=${this.visHostBaseUrl}
           .config=${this.config}
         ></gwf-vis-host>`,
       () => this.renderUI()
@@ -162,13 +166,16 @@ export class VGAApp extends LitElement {
     source?: FileSystemFileHandle | string | RecentOpened | null
   ) {
     if (!source) {
+      this.visHostBaseUrl = void 0;
       return;
     }
     if (typeof source === "string") {
+      this.visHostBaseUrl = new URL("./", source).href;
       this.loadConfigUrl(source);
       return;
     }
     if (source instanceof FileSystemFileHandle) {
+      this.visHostBaseUrl = void 0;
       const permissionStatus = await ((source as any).requestPermission({
         mode: "read",
       }) as Promise<PermissionState>);
@@ -179,6 +186,7 @@ export class VGAApp extends LitElement {
       this.loadConfigFile(source);
       return;
     }
+    this.visHostBaseUrl = void 0;
   }
 
   private async loadConfigUrl(url?: string) {
@@ -192,7 +200,7 @@ export class VGAApp extends LitElement {
         config: this.config,
       },
       "",
-      `?configFile=${url}`
+      `?configUrl=${url}`
     );
     this.updateRecents({
       name: this.config?.pageTitle,
