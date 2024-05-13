@@ -174,7 +174,7 @@ export class VGAApp extends LitElement {
       return;
     }
     if (typeof source === "string") {
-      this.visHostBaseUrl = new URL("./", source).href;
+      this.visHostBaseUrl = this.obtainVisHostBaseUrl(source);
       this.loadConfigUrl(source);
       return;
     }
@@ -201,7 +201,7 @@ export class VGAApp extends LitElement {
     this.config = await fetch(url).then((response) => response.json());
     history.pushState(
       {
-        visHostBaseUrl: new URL("./", url).href,
+        visHostBaseUrl: this.obtainVisHostBaseUrl(url),
         config: this.config,
       },
       "",
@@ -276,5 +276,18 @@ export class VGAApp extends LitElement {
       recents.pop();
     }
     await kv.set("recents", recents);
+  }
+
+  private obtainVisHostBaseUrl(url?: string) {
+    if (
+      !url ||
+      url.startsWith("data:") ||
+      url.startsWith("blob:") ||
+      url.startsWith("/")
+    ) {
+      return void 0;
+    } else if (url) {
+      return new URL("./", url).href;
+    }
   }
 }
