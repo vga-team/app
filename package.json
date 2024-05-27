@@ -11,7 +11,7 @@
   "dependencies": {
     "idb-keyval": "^6.2.1",
     "lit": "^2.7.2",
-    "vga-vis-host": "github:vga-team/vis-host#452c1ca179a792ffcff5f4abed71fac73cf3b768"
+    "vga-vis-host": "github:vga-team/vis-host#3e272286ef4599cf14a9432526edc11890fea14b"
   },
   "devDependencies": {
     "typescript": "^5.0.2",
