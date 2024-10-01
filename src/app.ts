@@ -5,6 +5,7 @@ import { when } from "lit/directives/when.js";
 import * as kv from "idb-keyval";
 import "vga-vis-host";
 import { GWFVisHostConfig } from "vga-vis-host";
+import demos from "./assets/demos.json";
 
 const VGA_ICON_SRC = "./icons/vga-512x512.png";
 const VGA_DEFAULT_NAME = "VGA App";
@@ -24,12 +25,36 @@ export class VGAApp extends LitElement {
     .logo {
       display: block;
       margin: auto;
-      max-width: 100vw;
+      max-width: 200px;
     }
     gwf-vis-ui-button {
       display: block;
       width: fit-content;
       margin: 10px auto;
+    }
+    .intro-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1em;
+      padding: 1em;
+      @media only screen and (max-width: 768px) {
+        grid-template-columns: 100%;
+      }
+      & > div {
+        border-radius: 10px;
+        box-shadow: 1px 1px 2px 1px hsl(0, 0%, 0%, 0.5);
+        padding: 1em;
+        user-select: none;
+      }
+    }
+    details {
+      padding: 1em;
+      & > summary {
+        user-select: none;
+        cursor: pointer;
+        font-size: 1.5em;
+        font-weight: bold;
+      }
     }
     .recent-card {
       display: grid;
@@ -116,53 +141,179 @@ export class VGAApp extends LitElement {
 
   private renderUI() {
     return html`
-      <img class="logo" src=${VGA_ICON_SRC} alt=${VGA_DEFAULT_NAME} />
-      <gwf-vis-ui-button @click=${() => this.loadConfigFile()}>
-        Load Config File
-      </gwf-vis-ui-button>
-      <gwf-vis-ui-button @click=${() => this.openConfigURL()}>
-        Open Config URL
-      </gwf-vis-ui-button>
+      ${this.renderLogo()} ${this.renderVisLoadingButtons()}
       <hr />
-      <h3>Recents</h3>
-      ${until(
-        kv.get("recents").then((recents: RecentOpened[]) =>
-          recents?.map(
-            ({ name, icon, source }, i) =>
-              html`<div
-                class="recent-card"
-                @click=${async () => {
-                  if (typeof source === "string") {
-                    location.search = `?configUrl=${source}`;
-                  }
-                  await this.loadConfig(source);
-                }}
-              >
-                <img
-                  src=${icon ?? VGA_ICON_SRC}
-                  alt=${name ?? VGA_DEFAULT_NAME}
-                />
-                <div>
-                  ${name ?? VGA_DEFAULT_NAME} -
-                  ${typeof source === "string"
-                    ? `URL: ${source}`
-                    : `File: ${source?.name}`}
-                </div>
-                <button
-                  class="remove-button"
-                  @click=${async (event: Event) => {
-                    event.stopPropagation();
-                    recents.splice(i, 1);
-                    kv.set("recents", recents);
-                    this.requestUpdate();
-                  }}
-                >
-                  Remove
-                </button>
-              </div>`
-          )
-        )
-      )}
+      ${this.renderIntro()}
+      <hr />
+      ${this.renderDemos()} ${this.renderRecents()}
+    `;
+  }
+
+  private renderLogo() {
+    return html`<img
+      class="logo"
+      src=${VGA_ICON_SRC}
+      alt=${VGA_DEFAULT_NAME}
+    />`;
+  }
+
+  private renderIntro() {
+    return html`
+      <div class="intro-cards">
+        <div>
+          <h3>What is VGA?</h3>
+          <ul>
+            <li>
+              <b>Modular Framework: </b>
+              VGA is a modular framework designed for building map-based
+              visualizations on the web.
+            </li>
+            <li>
+              <b>Plugin-Based: </b>
+              It uses a plugin-based architecture, allowing for flexible and
+              extensible visualizations.
+            </li>
+            <li>
+              <b>Progressive Web App: </b>
+              VGA is implemented as a Progressive Web App (PWA), which uses the
+              web technology but can provide some native app like experiences.
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3>Why use VGA?</h3>
+          <ul>
+            <li>
+              <b>Versatile Applications: </b>
+              VGA caters to various user needs, from scientists to
+              municipalities and government agencies, enabling diverse
+              geospatial data visualizations.
+            </li>
+            <li>
+              <b>Reduces Duplication: </b>
+              By offering reusable components, VGA minimizes the duplication of
+              efforts in creating custom visualization apps.
+            </li>
+            <li>
+              <b>Enhanced Interactivity: </b>
+              VGA supports interactive visualizations, making it easier to
+              explore and analyze geospatial data.
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3>How does VGA work?</h3>
+          <ul>
+            <li>
+              <b>Core and Plugins:</b>
+              The core of VGA acts as a host for plugins, which provide specific
+              visualization functionalities.
+            </li>
+            <li>
+              <b>Configuration-Based: </b>
+              Users can load configurations to dynamically render
+              visualizations, integrating multiple plugins as needed.
+            </li>
+            <li>
+              <b>Data Integration: </b>
+              VGA supports various data formats and sources, allowing for
+              comprehensive and detailed geospatial visualizations.
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div>To learn more, check <a href="https://github.com/vga-team/plugin-examples">here</a>.</div>
+    `;
+  }
+
+  private renderVisLoadingButtons() {
+    return html`
+      <div>
+        <gwf-vis-ui-button @click=${() => this.loadConfigFile()}>
+          Load Config File
+        </gwf-vis-ui-button>
+        <gwf-vis-ui-button @click=${() => this.openConfigURL()}>
+          Open Config URL
+        </gwf-vis-ui-button>
+      </div>
+    `;
+  }
+
+  private renderDemos() {
+    return html`
+      <details>
+        <summary>DEMOs</summary>
+        ${demos.map(
+          ({ name, icon, source }) =>
+            html`<div
+              class="recent-card"
+              @click=${async () => {
+                if (typeof source === "string") {
+                  location.search = `?configUrl=${source}`;
+                }
+                await this.loadConfig(source);
+              }}
+            >
+              <img
+                src=${icon ?? VGA_ICON_SRC}
+                alt=${name ?? VGA_DEFAULT_NAME}
+              />
+              <div>
+                ${name ?? VGA_DEFAULT_NAME} -
+                ${typeof source === "string" ? `URL: ${source}` : `N/A`}
+              </div>
+            </div>`
+        )}
+      </details>
+    `;
+  }
+
+  private renderRecents() {
+    return html`
+      <details>
+        <summary>Recents</summary>
+        ${until(
+          kv.get("recents").then((recents: RecentOpened[]) =>
+            recents
+              ? recents.map(
+                  ({ name, icon, source }, i) =>
+                    html`<div
+                      class="recent-card"
+                      @click=${async () => {
+                        if (typeof source === "string") {
+                          location.search = `?configUrl=${source}`;
+                        }
+                        await this.loadConfig(source);
+                      }}
+                    >
+                      <img
+                        src=${icon ?? VGA_ICON_SRC}
+                        alt=${name ?? VGA_DEFAULT_NAME}
+                      />
+                      <div>
+                        ${name ?? VGA_DEFAULT_NAME} -
+                        ${typeof source === "string"
+                          ? `URL: ${source}`
+                          : `File: ${source?.name}`}
+                      </div>
+                      <button
+                        class="remove-button"
+                        @click=${async (event: Event) => {
+                          event.stopPropagation();
+                          recents.splice(i, 1);
+                          kv.set("recents", recents);
+                          this.requestUpdate();
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </div>`
+                )
+              : "No recent items"
+          ),
+          "Loading..."
+        )}
+      </details>
     `;
   }
 
