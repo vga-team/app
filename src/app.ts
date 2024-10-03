@@ -22,29 +22,64 @@ export class VGAApp extends LitElement {
     :host {
       display: block;
     }
-    .logo {
-      display: block;
-      margin: auto;
-      max-width: 200px;
-    }
-    gwf-vis-ui-button {
-      display: block;
-      width: fit-content;
-      margin: 10px auto;
-    }
-    .intro-cards {
+    header {
+      position: sticky;
+      top: 0;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1em;
-      padding: 1em;
-      @media only screen and (max-width: 768px) {
-        grid-template-columns: 100%;
+      grid-template-columns: auto 1fr auto;
+      gap: 0.5em;
+      background-color: hsl(0, 0%, 100%);
+      z-index: 100;
+      box-shadow: 0 0 5px hsl(0, 0%, 0%, 0.5);
+      & > :nth-child(1) {
+        margin: auto;
+        max-width: 5em;
       }
-      & > div {
-        border-radius: 10px;
-        box-shadow: 1px 1px 2px 1px hsl(0, 0%, 0%, 0.5);
+      & > :nth-child(2) {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin-block: auto;
+      }
+      & > :nth-child(3) {
+        display: grid;
+        grid-template-rows: auto auto;
+        padding: 0.5em;
+        gwf-vis-ui-button {
+          margin: auto;
+          height: fit-content;
+          width: fit-content;
+        }
+      }
+    }
+    .intro {
+      background-image: url(./teaser.jpg);
+      background-size: cover;
+      & .intro-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1em;
         padding: 1em;
-        user-select: none;
+        max-width: 1200px;
+        margin-inline: auto;
+        padding-block: 3em;
+        @media only screen and (max-width: 768px) {
+          grid-template-columns: 100%;
+        }
+        & > div {
+          border-radius: 10px;
+          box-shadow: 1px 1px 2px 1px hsl(0, 0%, 0%, 0.5);
+          padding: 1em;
+          user-select: none;
+          background-color: hsl(0, 0%, 100%);
+          opacity: 0.8;
+          & > h3 {
+            text-align: center;
+          }
+        }
+      }
+      & details {
+        background-color: hsl(0, 0%, 100%);
+        opacity: 0.8;
       }
     }
     details {
@@ -54,6 +89,45 @@ export class VGAApp extends LitElement {
         cursor: pointer;
         font-size: 1.5em;
         font-weight: bold;
+      }
+    }
+    .demos {
+      display: flex;
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 0.5em;
+      gap: 0.5em;
+      & > .demo-card {
+        all: initial;
+        flex: 0 0 auto;
+        font-family: inherit;
+        overflow: hidden;
+        position: relative;
+        display: block;
+        height: 150px;
+        width: 150px;
+        background-size: 80%;
+        background-repeat: no-repeat;
+        background-position: center;
+        border-radius: 10px;
+        box-shadow: 1px 1px 2px 1px hsl(0, 0%, 0%, 0.5);
+        cursor: pointer;
+        &:hover {
+          box-shadow: 1px 1px 5px 2px hsl(0, 0%, 0%, 0.5);
+        }
+        &:active {
+          box-shadow: inset 1px 1px 5px 2px hsl(0, 0%, 0%, 0.5);
+        }
+        & > div {
+          position: absolute;
+          display: block;
+          bottom: 0;
+          margin-inline: auto;
+          text-align: center;
+          width: 100%;
+          background-color: hsl(0, 0%, 80%);
+          opacity: 0.8;
+        }
       }
     }
     .recent-card {
@@ -141,129 +215,127 @@ export class VGAApp extends LitElement {
 
   private renderUI() {
     return html`
-      ${this.renderLogo()} ${this.renderVisLoadingButtons()}
-      <hr />
-      ${this.renderIntro()}
-      <hr />
-      ${this.renderDemos()} ${this.renderRecents()}
+      ${this.renderHeader()} ${this.renderIntro()} ${this.renderDemos()}
+      ${this.renderRecents()}
     `;
   }
 
-  private renderLogo() {
-    return html`<img
-      class="logo"
-      src=${VGA_ICON_SRC}
-      alt=${VGA_DEFAULT_NAME}
-    />`;
+  private renderHeader() {
+    return html`
+      <header class="header">
+        <img class="logo" src=${VGA_ICON_SRC} alt=${VGA_DEFAULT_NAME} />
+        <span>Visualization for Geospatial Analysis</span>
+        <div>
+          <gwf-vis-ui-button @click=${() => this.loadConfigFile()}>
+            Load Config File
+          </gwf-vis-ui-button>
+          <gwf-vis-ui-button @click=${() => this.openConfigURL()}>
+            Load Config URL
+          </gwf-vis-ui-button>
+        </div>
+      </header>
+    `;
   }
 
   private renderIntro() {
     return html`
-      <div class="intro-cards">
-        <div>
-          <h3>What is VGA?</h3>
+      <div class="intro">
+        <div class="intro-cards">
+          <div>
+            <h3>What is VGA?</h3>
+            <ul>
+              <li>
+                <b>Modular Framework: </b>
+                VGA is a modular framework designed for building map-based
+                visualizations on the web.
+              </li>
+              <li>
+                <b>Plugin-Based: </b>
+                It uses a plugin-based architecture, allowing for flexible and
+                extensible visualizations.
+              </li>
+              <li>
+                <b>Progressive Web App: </b>
+                VGA is implemented as a Progressive Web App (PWA), which uses
+                the web technology but can provide some native app like
+                experiences.
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3>Why use VGA?</h3>
+            <ul>
+              <li>
+                <b>Versatile Applications: </b>
+                VGA caters to various user needs, from scientists to
+                municipalities and government agencies, enabling diverse
+                geospatial data visualizations.
+              </li>
+              <li>
+                <b>Reduces Duplication: </b>
+                By offering reusable components, VGA minimizes the duplication
+                of efforts in creating custom visualization apps.
+              </li>
+              <li>
+                <b>Enhanced Interactivity: </b>
+                VGA supports interactive visualizations, making it easier to
+                explore and analyze geospatial data.
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h3>How does VGA work?</h3>
+            <ul>
+              <li>
+                <b>Core and Plugins:</b>
+                The core of VGA acts as a host for plugins, which provide
+                specific visualization functionalities.
+              </li>
+              <li>
+                <b>Configuration-Based: </b>
+                Users can load configurations to dynamically render
+                visualizations, integrating multiple plugins as needed.
+              </li>
+              <li>
+                <b>Data Integration: </b>
+                VGA supports various data formats and sources, allowing for
+                comprehensive and detailed geospatial visualizations.
+              </li>
+            </ul>
+          </div>
+        </div>
+        <details>
+          <summary>Helpful Links</summary>
           <ul>
             <li>
-              <b>Modular Framework: </b>
-              VGA is a modular framework designed for building map-based
-              visualizations on the web.
-            </li>
-            <li>
-              <b>Plugin-Based: </b>
-              It uses a plugin-based architecture, allowing for flexible and
-              extensible visualizations.
-            </li>
-            <li>
-              <b>Progressive Web App: </b>
-              VGA is implemented as a Progressive Web App (PWA), which uses the
-              web technology but can provide some native app like experiences.
+              <a href="https://github.com/vga-team/plugin-examples"
+                >Plugin Examples</a
+              >
             </li>
           </ul>
-        </div>
-        <div>
-          <h3>Why use VGA?</h3>
-          <ul>
-            <li>
-              <b>Versatile Applications: </b>
-              VGA caters to various user needs, from scientists to
-              municipalities and government agencies, enabling diverse
-              geospatial data visualizations.
-            </li>
-            <li>
-              <b>Reduces Duplication: </b>
-              By offering reusable components, VGA minimizes the duplication of
-              efforts in creating custom visualization apps.
-            </li>
-            <li>
-              <b>Enhanced Interactivity: </b>
-              VGA supports interactive visualizations, making it easier to
-              explore and analyze geospatial data.
-            </li>
-          </ul>
-        </div>
-        <div>
-          <h3>How does VGA work?</h3>
-          <ul>
-            <li>
-              <b>Core and Plugins:</b>
-              The core of VGA acts as a host for plugins, which provide specific
-              visualization functionalities.
-            </li>
-            <li>
-              <b>Configuration-Based: </b>
-              Users can load configurations to dynamically render
-              visualizations, integrating multiple plugins as needed.
-            </li>
-            <li>
-              <b>Data Integration: </b>
-              VGA supports various data formats and sources, allowing for
-              comprehensive and detailed geospatial visualizations.
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div>To learn more, check <a href="https://github.com/vga-team/plugin-examples">here</a>.</div>
-    `;
-  }
-
-  private renderVisLoadingButtons() {
-    return html`
-      <div>
-        <gwf-vis-ui-button @click=${() => this.loadConfigFile()}>
-          Load Config File
-        </gwf-vis-ui-button>
-        <gwf-vis-ui-button @click=${() => this.openConfigURL()}>
-          Open Config URL
-        </gwf-vis-ui-button>
+        </details>
       </div>
     `;
   }
 
   private renderDemos() {
     return html`
-      <details>
+      <details open>
         <summary>DEMOs</summary>
-        ${demos.map(
-          ({ name, icon, source }) =>
-            html`<div
-              class="recent-card"
-              @click=${async () => {
-                if (typeof source === "string") {
-                  location.search = `?configUrl=${source}`;
-                }
-                await this.loadConfig(source);
-              }}
-            >
-              <img
-                src=${icon ?? VGA_ICON_SRC}
-                alt=${name ?? VGA_DEFAULT_NAME}
-              />
-              <div>
-                ${name ?? VGA_DEFAULT_NAME} -
-                ${typeof source === "string" ? `URL: ${source}` : `N/A`}
-              </div>
-            </div>`
-        )}
+        <div class="demos">
+          ${demos.map(
+            ({ label, image, href }) =>
+              html`
+                <a
+                  class="demo-card"
+                  style="background-image: url(${image});"
+                  href=${href}
+                >
+                  <div>${label}</div>
+                </a>
+              `
+          )}
+        </div>
       </details>
     `;
   }
