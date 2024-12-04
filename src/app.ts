@@ -1,5 +1,6 @@
 import { html, css, LitElement } from "lit";
 import { customElement, state } from "lit/decorators.js";
+import { createRef, ref } from "lit/directives/ref.js";
 import { until } from "lit/directives/until.js";
 import { when } from "lit/directives/when.js";
 import * as kv from "idb-keyval";
@@ -42,7 +43,7 @@ export class VGAApp extends LitElement {
       }
       & > :nth-child(3) {
         display: grid;
-        grid-template-rows: auto auto;
+        grid-template-rows: auto;
         padding: 0.5em;
         gwf-vis-ui-button {
           margin: auto;
@@ -176,6 +177,8 @@ export class VGAApp extends LitElement {
   @state()
   visHostBaseUrl?: string;
 
+  private loadConfigDialogRef = createRef<HTMLDialogElement>();
+
   async firstUpdated() {
     if (history.state?.config) {
       this.visHostBaseUrl = history.state.visHostBaseUrl;
@@ -226,12 +229,36 @@ export class VGAApp extends LitElement {
         <img class="logo" src=${VGA_ICON_SRC} alt=${VGA_DEFAULT_NAME} />
         <span>Visualization for Geospatial Analysis</span>
         <div>
-          <gwf-vis-ui-button @click=${() => this.loadConfigFile()}>
-            Load Config File
+          <gwf-vis-ui-button
+            @click=${() => this.loadConfigDialogRef.value?.showModal()}
+          >
+            Load Config
           </gwf-vis-ui-button>
-          <gwf-vis-ui-button @click=${() => this.openConfigURL()}>
-            Load Config URL
-          </gwf-vis-ui-button>
+          <dialog ${ref(this.loadConfigDialogRef)}>
+            <gwf-vis-ui-button
+              @click=${() => {
+                this.loadConfigDialogRef.value?.close();
+                this.loadConfigFile();
+              }}
+            >
+              Load Config File
+            </gwf-vis-ui-button>
+            <gwf-vis-ui-button
+              @click=${() => {
+                this.loadConfigDialogRef.value?.close();
+                this.openConfigURL();
+              }}
+            >
+              Load Config URL
+            </gwf-vis-ui-button>
+            <gwf-vis-ui-button
+              @click=${() => {
+                this.loadConfigDialogRef.value?.close();
+              }}
+            >
+              Cancel
+            </gwf-vis-ui-button>
+          </dialog>
         </div>
       </header>
     `;
