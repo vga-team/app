@@ -4,8 +4,8 @@ import { createRef, ref } from "lit/directives/ref.js";
 import { until } from "lit/directives/until.js";
 import { when } from "lit/directives/when.js";
 import * as kv from "idb-keyval";
-import "vga-vis-host";
-import { GWFVisHostConfig } from "vga-vis-host";
+import "vga-core";
+import { VGAConfig } from "vga-core";
 import demos from "./assets/demos.json";
 
 const VGA_ICON_SRC = "./icons/vga-512x512.png";
@@ -45,7 +45,7 @@ export class VGAApp extends LitElement {
         display: grid;
         grid-template-rows: auto;
         padding: 0.5em;
-        gwf-vis-ui-button {
+        vga-ui-button {
           margin: auto;
           height: fit-content;
           width: fit-content;
@@ -172,7 +172,7 @@ export class VGAApp extends LitElement {
   `;
 
   @state()
-  config?: GWFVisHostConfig;
+  config?: VGAConfig;
 
   @state()
   visHostBaseUrl?: string;
@@ -207,11 +207,11 @@ export class VGAApp extends LitElement {
     return html`${when(
       this.config,
       () =>
-        html`<gwf-vis-host
+        html`<vga-core
           allow-modifying-page-info
           .configBaseUrl=${this.visHostBaseUrl}
           .config=${this.config}
-        ></gwf-vis-host>`,
+        ></vga-core>`,
       () => this.renderUI()
     )}`;
   }
@@ -229,35 +229,35 @@ export class VGAApp extends LitElement {
         <img class="logo" src=${VGA_ICON_SRC} alt=${VGA_DEFAULT_NAME} />
         <span>Visualization for Geospatial Analysis</span>
         <div>
-          <gwf-vis-ui-button
+          <vga-ui-button
             @click=${() => this.loadConfigDialogRef.value?.showModal()}
           >
             Load Config
-          </gwf-vis-ui-button>
+          </vga-ui-button>
           <dialog ${ref(this.loadConfigDialogRef)}>
-            <gwf-vis-ui-button
+            <vga-ui-button
               @click=${() => {
                 this.loadConfigDialogRef.value?.close();
                 this.loadConfigFile();
               }}
             >
               Load Config File
-            </gwf-vis-ui-button>
-            <gwf-vis-ui-button
+            </vga-ui-button>
+            <vga-ui-button
               @click=${() => {
                 this.loadConfigDialogRef.value?.close();
                 this.openConfigURL();
               }}
             >
               Load Config URL
-            </gwf-vis-ui-button>
-            <gwf-vis-ui-button
+            </vga-ui-button>
+            <vga-ui-button
               @click=${() => {
                 this.loadConfigDialogRef.value?.close();
               }}
             >
               Cancel
-            </gwf-vis-ui-button>
+            </vga-ui-button>
           </dialog>
         </div>
       </header>

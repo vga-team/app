@@ -1,5 +1,5 @@
 {
-  "name": "gwf-vis-app",
+  "name": "vga-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,7 +11,7 @@
   "dependencies": {
     "idb-keyval": "^6.2.1",
     "lit": "^2.7.2",
-    "vga-vis-host": "github:vga-team/vis-host#3e272286ef4599cf14a9432526edc11890fea14b"
+    "vga-core": "github:vga-team/core#a619a30e5d968d123bbc12e4c5008a903671fa91"
   },
   "devDependencies": {
     "typescript": "^5.0.2",
