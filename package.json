@@ -11,7 +11,7 @@
   "dependencies": {
     "idb-keyval": "^6.2.1",
     "lit": "^2.7.2",
-    "vga-core": "github:vga-team/core#8b160b2bad765457dd96c582f8368ad48154bf44"
+    "vga-core": "github:vga-team/core#9a15d8c6fd9bcb4b5f23c8d5e0f1301507f12c88"
   },
   "devDependencies": {
     "typescript": "^5.0.2",
