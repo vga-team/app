@@ -209,6 +209,7 @@ export class VGAApp extends LitElement {
       () =>
         html`<vga-core
           allow-modifying-page-info
+          use-view-transitions
           .configBaseUrl=${this.visHostBaseUrl}
           .config=${this.config}
         ></vga-core>`,
