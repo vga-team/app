@@ -208,8 +208,10 @@ export class VGAApp extends LitElement {
       this.config,
       () =>
         html`<vga-core
+          exportparts="vga-plugin-container"
           allow-modifying-page-info
           use-view-transitions
+          view-transition-selector="vga-app::part(vga-plugin-container)"
           .configBaseUrl=${this.visHostBaseUrl}
           .config=${this.config}
         ></vga-core>`,
